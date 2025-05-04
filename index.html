@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Record | WEB-BASED 3D GAME COURSE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Montserrat:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+            --complete: #27ae60;
+            --partial: #f39c12;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            min-width: 320px; /* Prevent horizontal scrolling on very small devices */
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 15px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-radius: 0;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                margin: 20px auto;
+                padding: 20px;
+                border-radius: 8px;
+            }
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+        
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--primary);
+            margin: 0;
+            font-weight: 600;
+            font-size: 22px;
+        }
+        
+        .course-title {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        @media (min-width: 480px) {
+            .controls {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .course-title {
+                font-size: 13px;
+            }
+        }
+        
+        .json-editor {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .json-editor {
+                flex-direction: row;
+            }
+        }
+        
+        .json-textarea {
+            flex: 1;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .json-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        @media (min-width: 768px) {
+            .json-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .attendance-summary {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            font-size: 13px;
+        }
+        
+        .summary-item {
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-weight: 500;
+            font-size: 15px;
+            color: var(--primary);
+            margin-top: 3px;
+        }
+        
+        .total-hours {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        
+        @media (min-width: 480px) {
+            .total-hours {
+                font-size: 14px;
+            }
+        }
+        
+        .total-hours strong {
+            color: var(--secondary);
+        }
+        
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        @media (min-width: 768px) {
+            .attendance-table {
+                display: table;
+                white-space: normal;
+            }
+        }
+        
+        .attendance-table thead {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .attendance-table th {
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 500;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+        }
+        
+        @media (min-width: 480px) {
+            .attendance-table th {
+                padding: 12px 10px;
+                font-size: 13px;
+            }
+        }
+        
+        .attendance-table td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+        
+        @media (min-width: 480px) {
+            .attendance-table td {
+                padding: 10px;
+            }
+        }
+        
+        .attendance-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .attendance-table tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .present {
+            color: var(--complete);
+        }
+        
+        .hours-completed {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .hour-checkbox {
+            margin: 0;
+            accent-color: var(--complete);
+            transform: scale(1.1);
+        }
+        
+        .date-input {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            width: 100px;
+        }
+        
+        @media (min-width: 480px) {
+            .date-input {
+                width: 120px;
+            }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .website-link {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .website-link:hover {
+            text-decoration: underline;
+        }
+        
+        .student-name {
+            font-weight: 500;
+        }
+        
+        .empty-row {
+            color: var(--gray);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Attendance Record</h1>
+            <div class="course-title">WEB-BASED 3D GAME COURSE</div>
+        </header>
+        
+        <div class="controls">
+            <button class="btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print
+            </button>
+            <div>
+                <button class="btn-secondary" onclick="exportToJson()">
+                    <i class="fas fa-download"></i> Export JSON
+                </button>
+                <button class="btn-secondary" onclick="toggleJsonEditor()">
+                    <i class="fas fa-edit"></i> Edit JSON
+                </button>
+            </div>
+        </div>
+        
+        <div class="json-editor" id="jsonEditor" style="display: none;">
+            <textarea class="json-textarea" id="jsonData"></textarea>
+            <div class="json-buttons">
+                <button class="btn-primary" onclick="importFromJson()">
+                    <i class="fas fa-check"></i> Apply
+                </button>
+                <button class="btn-secondary" onclick="toggleJsonEditor()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+        
+        <div class="total-hours" id="totalHours">
+            <!-- Dynamically filled by JavaScript -->
+        </div>
+        
+        <div class="attendance-summary" id="attendanceSummary">
+            <!-- Dynamically filled by JavaScript -->
+        </div>
+        
+        <table class="attendance-table" id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    <th>Date</th>
+                    <th>Second Date (if partial)</th>
+                    <th>Status</th>
+                    <th>Hours</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceBody">
+                <!-- Dynamically filled by JavaScript -->
+            </tbody>
+        </table>
+        
+        <div class="footer">
+            <p>Course attendance tracking system | <a href="http://www.codekanit.com" class="website-link">www.codekanit.com</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Sample data structure
+        let attendanceData = {
+            student: "Ryuji",
+            course: "WEB-BASED 3D GAME COURSE",
+            totalClasses: 12,
+            sessions: [
+                { id: 1, date1: "2025-01-25", date2: "", hours: [true, true] },
+                { id: 2, date1: "2025-01-26", date2: "", hours: [true, true] },
+                { id: 3, date1: "2025-02-01", date2: "", hours: [true, true] },
+                { id: 4, date1: "2025-02-09", date2: "", hours: [true, true] },
+                { id: 5, date1: "2025-02-16", date2: "", hours: [true, true] },
+                { id: 6, date1: "2025-03-01", date2: "", hours: [true, true] },
+                { id: 7, date1: "2025-03-09", date2: "", hours: [true, true] },
+                { id: 8, date1: "2025-03-29", date2: "", hours: [true, true] },
+                { id: 9, date1: "2025-03-30", date2: "", hours: [true, true] },
+                { id: 10, date1: "2025-04-20", date2: "2025-04-21", hours: [true, false] },
+                { id: 11, date1: "", date2: "", hours: [false, false] },
+                { id: 12, date1: "", date2: "", hours: [false, false] }
+            ]
+        };
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAttendanceTable();
+            updateSummary();
+        });
+
+        // Render the attendance table
+        function renderAttendanceTable() {
+            const tbody = document.getElementById('attendanceBody');
+            tbody.innerHTML = '';
+            
+            attendanceData.sessions.forEach(session => {
+                const row = document.createElement('tr');
+                if (session.date1 === '') {
+                    row.classList.add('empty-row');
+                }
+                
+                row.innerHTML = `
+                    <td>${session.id}</td>
+                    <td class="student-name">${attendanceData.student}</td>
+                    <td><input type="date" class="date-input" value="${session.date1}" data-id="${session.id}" data-hour="1"></td>
+                    <td><input type="date" class="date-input" value="${session.date2}" data-id="${session.id}" data-hour="2" ${session.hours[1] ? 'disabled' : ''}></td>
+                    <td class="${session.date1 ? 'present' : ''}">${session.date1 ? 'Present' : ''}</td>
+                    <td class="hours-completed">
+                        <input type="checkbox" class="hour-checkbox" ${session.hours[0] ? 'checked' : ''} data-id="${session.id}" data-hour="1">
+                        <input type="checkbox" class="hour-checkbox" ${session.hours[1] ? 'checked' : ''} data-id="${session.id}" data-hour="2">
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Add event listeners
+            document.querySelectorAll('.hour-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const sessionId = parseInt(this.dataset.id);
+                    const hour = parseInt(this.dataset.hour);
+                    const session = attendanceData.sessions.find(s => s.id === sessionId);
+                    
+                    // Update hour status
+                    session.hours[hour-1] = this.checked;
+                    
+                    // If second hour is unchecked, enable date2 input
+                    if (hour === 2) {
+                        const date2Input = document.querySelector(`.date-input[data-id="${sessionId}"][data-hour="2"]`);
+                        date2Input.disabled = this.checked;
+                        
+                        // If unchecked and date1 exists but date2 doesn't, set date2 to next day
+                        if (!this.checked && session.date1 && !session.date2) {
+                            const nextDay = new Date(session.date1);
+                            nextDay.setDate(nextDay.getDate() + 1);
+                            session.date2 = formatDate(nextDay);
+                            date2Input.value = session.date2;
+                        }
+                    }
+                    
+                    updateSummary();
+                });
+            });
+            
+            document.querySelectorAll('.date-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const sessionId = parseInt(this.dataset.id);
+                    const hour = parseInt(this.dataset.hour);
+                    const session = attendanceData.sessions.find(s => s.id === sessionId);
+                    
+                    if (hour === 1) {
+                        session.date1 = this.value;
+                        // If this is a new session, mark both hours as present
+                        if (this.value && !session.hours[0]) {
+                            session.hours = [true, true];
+                            const checkboxes = document.querySelectorAll(`.hour-checkbox[data-id="${sessionId}"]`);
+                            checkboxes.forEach(cb => cb.checked = true);
+                            document.querySelector(`.date-input[data-id="${sessionId}"][data-hour="2"]`).disabled = true;
+                        }
+                    } else {
+                        session.date2 = this.value;
+                    }
+                    
+                    updateSummary();
+                });
+            });
+        }
+
+        // Update summary information
+        function updateSummary() {
+            const attendedSessions = attendanceData.sessions.filter(s => s.date1).length;
+            const completedHours = attendanceData.sessions.reduce((total, session) => {
+                return total + session.hours.filter(h => h).length;
+            }, 0);
+            const fullSessions = attendanceData.sessions.filter(s => s.hours[0] && s.hours[1]).length;
+            const partialSessions = attendedSessions - fullSessions;
+            const attendanceRate = Math.round((completedHours / (attendanceData.totalClasses * 2)) * 100);
+            
+            // Update total hours display
+            document.getElementById('totalHours').innerHTML = `
+                <strong>Total Classes:</strong> ${attendanceData.totalClasses} sessions (${attendanceData.totalClasses * 2} hours) | 
+                <strong>Attended:</strong> ${attendedSessions} sessions (${completedHours} hours) | 
+                <strong>Remaining:</strong> ${attendanceData.totalClasses - attendedSessions} sessions (${(attendanceData.totalClasses * 2) - completedHours} hours)
+            `;
+            
+            // Update summary
+            document.getElementById('attendanceSummary').innerHTML = `
+                <div class="summary-item">
+                    <div class="summary-label">Student</div>
+                    <div class="summary-value student-name">${attendanceData.student}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Classes Attended</div>
+                    <div class="summary-value">${attendedSessions}/${attendanceData.totalClasses}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Hours Completed</div>
+                    <div class="summary-value">${completedHours}/${attendanceData.totalClasses * 2}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Attendance Rate</div>
+                    <div class="summary-value">${attendanceRate}%</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Full Sessions</div>
+                    <div class="summary-value">${fullSessions}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Partial Sessions</div>
+                    <div class="summary-value">${partialSessions}</div>
+                </div>
+            `;
+        }
+
+        // Toggle JSON editor visibility
+        function toggleJsonEditor() {
+            const editor = document.getElementById('jsonEditor');
+            if (editor.style.display === 'none') {
+                document.getElementById('jsonData').value = JSON.stringify(attendanceData, null, 2);
+                editor.style.display = 'flex';
+            } else {
+                editor.style.display = 'none';
+            }
+        }
+
+        // Import data from JSON
+        function importFromJson() {
+            try {
+                const newData = JSON.parse(document.getElementById('jsonData').value);
+                attendanceData = newData;
+                renderAttendanceTable();
+                updateSummary();
+                toggleJsonEditor();
+            } catch (e) {
+                alert('Invalid JSON: ' + e.message);
+            }
+        }
+
+        // Export data to JSON
+        function exportToJson() {
+            const dataStr = JSON.stringify(attendanceData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportName = `attendance_${attendanceData.student}_${formatDate(new Date())}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportName);
+            linkElement.click();
+        }
+
+        // Helper function to format date as YYYY-MM-DD
+        function formatDate(date) {
+            if (!(date instanceof Date)) return '';
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+    </script>
+</body>
+</html>
